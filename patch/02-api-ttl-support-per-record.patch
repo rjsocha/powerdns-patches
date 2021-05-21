@@ -1,0 +1,26 @@
+diff --git a/pdns/ws-auth.cc b/pdns/ws-auth.cc
+index e26479b74..8a08c33e2 100644
+--- a/pdns/ws-auth.cc
++++ b/pdns/ws-auth.cc
+@@ -458,7 +458,8 @@ static void fillZone(UeberBackend& B, const DNSName& zonename, HttpResponse* res
+         ttl = min(ttl, rit->ttl);
+         rrset_records.push_back(Json::object {
+           { "disabled", rit->disabled },
+-          { "content", makeApiRecordContent(rit->qtype, rit->content) }
++          { "content", makeApiRecordContent(rit->qtype, rit->content) },
++	  { "ttl", (int) rit->ttl }
+         });
+         rit++;
+       }
+@@ -531,6 +532,11 @@ static void gatherRecords(UeberBackend& B, const string& logprefix, const Json&
+     if(!record["disabled"].is_null()) {
+       rr.disabled = boolFromJson(record, "disabled");
+     }
++    if(!record["ttl"].is_null()) {
++      rr.ttl = intFromJson(record, "ttl");
++    } else {
++      rr.ttl = ttl;
++    }
+ 
+     // validate that the client sent something we can actually parse, and require that data to be dotted.
+     try {
